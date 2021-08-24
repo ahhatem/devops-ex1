@@ -1,8 +1,3 @@
-variable "key_name" {
-    type=string
-    default="Dell_SAS_Key"
-}
-
 resource "tls_private_key" "Dell_SAS_Key" {
   algorithm = "RSA"
   rsa_bits  = 4096

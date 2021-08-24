@@ -14,3 +14,8 @@ variable "DEFULT_SG"{
     type=string
     default="sg-ba6a46d3"
 }
+
+variable "key_name" {
+    type=string
+    default="Dell_SAS_Key"
+}
