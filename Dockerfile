@@ -4,10 +4,12 @@ RUN yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashic
 RUN yum -y install terraform
 RUN yum -y install epel-release
 RUN yum -y install ansible
+RUN yum -y install openssh openssh-clients
 RUN echo 'export PATH=$PATH:/usr/bin/' >> ~/.bashrc
 WORKDIR '/Config'
 COPY ./Modules.tf .
-COPY ./awsCredentials.tfvars .
+COPY ./awsCredentials.auto.tfvars .
 RUN terraform init
 COPY ./*.tf .
 COPY ./*.tfvars .
+RUN terraform init
