@@ -10,6 +10,8 @@ WORKDIR '/Config'
 COPY ./Modules.tf .
 COPY ./awsCredentials.auto.tfvars .
 RUN terraform init
-COPY ./*.tf .
-COPY ./*.tfvars .
+COPY ./* .
 RUN terraform init
+RUN chmod 700 Deploy.sh
+RUN chmod 700 Destroy.sh
+CMD "Deploy.sh"

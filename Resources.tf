@@ -3,7 +3,13 @@ resource "tls_private_key" "Dell_SAS_Key" {
   rsa_bits  = 4096
 }
 
-resource "aws_key_pair" "Dell_SAS_Key" {
+resource "null_resource" "null"{
+    provisioner "local-exec" {
+        command = "echo > hosts.ini"
+    }
+}
+
+resource "aws_key_pair" "Dell_SAS_AWSKey" {
   key_name   = var.key_name
   public_key = tls_private_key.Dell_SAS_Key.public_key_openssh
 
@@ -12,12 +18,30 @@ resource "aws_key_pair" "Dell_SAS_Key" {
   }
 }
 
-resource "aws_instance" "dell_SAS_SAM"{
+resource "aws_instance" "Dell_SAS_SAM"{
     ami = var.AMIS[var.AWS_REGION]
     instance_type= "t2.small"
-    key_name = aws_key_pair.Dell_SAS_Key.key_name
+    key_name = aws_key_pair.Dell_SAS_AWSKey.key_name
     tags={
         Name="Dell_SAS_SAM"
         env="Dell_SAS"
+    }
+
+    provisioner "local-exec" {
+        command = "echo -e '[SAM]\n${aws_instance.Dell_SAS_SAM.public_ip}\n' >> hosts.ini"
+    }
+}
+
+resource "aws_instance" "Dell_SAS_IP"{
+    ami = var.AMIS[var.AWS_REGION]
+    instance_type= "t2.small"
+    key_name = aws_key_pair.Dell_SAS_AWSKey.key_name
+    tags={
+        Name="Dell_SAS_IP"
+        env="Dell_SAS"
+    }
+
+    provisioner "local-exec" {
+        command = "echo -e '[IP]\n${aws_instance.Dell_SAS_IP.public_ip}\n' >> hosts.ini"
     }
 }
