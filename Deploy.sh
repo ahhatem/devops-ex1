@@ -3,6 +3,8 @@
 # exit when any command fails (return non-zero value)
 set -e
 
-terraform apply -auto-approve
+cd Terraform
+./Deploy.sh
 sleep 20
-ansible-playbook -i hosts.ini --private-key Dell_SAS_Key.pem -u ec2-user DeploySmarts.yml
+cd ../Ansible
+./Deploy.sh

@@ -1,0 +1,139 @@
+- hosts: API
+  become: yes
+  tags:
+    - api
+  tasks:
+  - name: test
+    file:
+        dest: /tmp/Dell_DemoApp_API
+        state: touch
+  - name: dbName
+    template:
+        src: DB_url.j2
+        dest: /tmp/Dell_DemoApp_DB
+  - name: Install docker
+    yum:
+        name: 
+            - docker
+            - git
+        state: present
+    become: yes
+  - name: Start service docker
+    ansible.builtin.service:
+      name: docker
+      state: started
+      enabled: yes
+    become: yes
+  - name: Delete content & directory
+    file:
+      state: absent
+      path: /app
+  - name: create source folder
+    file:
+        dest: /app
+        state: directory
+        mode: '0777'
+    become: yes
+  - name: Example clone of a single branch
+    git:
+      repo: https://github.com/busbud/devops-challenge-apps.git
+      dest: /app
+      version: master
+  - name: Install docker-compose
+    get_url: 
+      url : https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-Linux-x86_64
+      dest: /usr/bin/docker-compose
+      mode: 'u+x,g+x'
+  - name: Change node version for bug with pgsql
+    lineinfile: 
+      path: /app/api/docker-compose.yml
+      regexp: '^(.*)node:latest'
+      line: '\1node:12.18.3-alpine3.12'
+      backrefs: yes
+      state: present
+  - name: run docker compose install
+    shell: 
+      cmd: /usr/bin/docker-compose run api npm install
+      chdir: /app/api
+  - name: Adding the envvars in the Profile files
+    lineinfile: dest=/etc/environment line='export API_PORT=5000\nexport API_DB=postgres://{{dbusername}}:{{dbpass}}@{{db}}/{{dbname}}' state=present
+  - name: Source the bash_profile file
+    shell: source /etc/environment
+  - name: run docker compose start
+    shell: 
+      cmd: /usr/bin/docker-compose up  -d
+      chdir: /app/api
+#    environment: 
+#      API_PORT: 5000
+#      API_DB: postgres://{{dbusername}}:{{dbpass}}@{{db}}/{{dbname}}  #postgres://username:password@{{ groups['DB'][0] }}/database
+      
+
+
+
+
+
+- hosts: Web
+  become: yes
+  tags:
+    - web
+  tasks:
+  - name: test
+    file:
+        dest: /tmp/Dell_DemoApp_Web
+        state: touch
+  - name: APIName
+    file:
+        dest: /tmp/Dell_DemoApp_API_{{API}}
+        state: touch
+  - name: Install docker
+    yum:
+        name: 
+            - docker
+            - git
+        state: present
+    become: yes
+  - name: Start service docker
+    ansible.builtin.service:
+      name: docker
+      state: started
+      enabled: yes
+    become: yes
+  - name: Delete content & directory
+    file:
+      state: absent
+      path: /app
+  - name: create source folder
+    file:
+        dest: /app
+        state: directory
+        mode: '0777'
+    become: yes
+  - name: Example clone of a single branch
+    git:
+      repo: https://github.com/busbud/devops-challenge-apps.git
+      dest: /app
+      version: master
+  - name: Install docker-compose
+    become: yes
+    get_url: 
+      url : https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-Linux-x86_64
+      dest: /usr/bin/docker-compose
+      mode: 'u+x,g+x'
+  - name: run docker compose install
+    shell: 
+      cmd: /usr/bin/docker-compose run web npm install
+      chdir: /app/web
+  - name: Adding the envvar1 in the Profile files
+    lineinfile: dest=/etc/environment regexp='.*WEB_PORT.*' line='export WEB_PORT=5000' state=present
+  - name: Adding the envvar2 in the Profile files
+    lineinfile: dest=/etc/environment regexp='.*API_HOST.*' line='export API_HOST=http://{{API}}:5000' state=present
+  - name: Source the bash_profile file
+    shell: source /etc/environment
+  - name: run docker compose start
+    shell: 
+      cmd: /usr/bin/docker-compose up  -d
+      chdir: /app/web
+#    environment: 
+#      WEB_PORT: 5000
+#      API_HOST: "{{API}}:5000"
+

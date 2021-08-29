@@ -6,12 +6,16 @@ RUN yum -y install epel-release
 RUN yum -y install ansible
 RUN yum -y install openssh openssh-clients
 RUN echo 'export PATH=$PATH:/usr/bin/' >> ~/.bashrc
+WORKDIR '/Config/Terraform'
+COPY Terraform/Modules.tf .
+COPY Terraform/awsCredentials.auto.tfvars .
+RUN terraform init
+COPY Terraform/* .
+RUN terraform init
+WORKDIR '/Config/Ansible'
+COPY Ansible/* .
 WORKDIR '/Config'
-COPY ./Modules.tf .
-COPY ./awsCredentials.auto.tfvars .
-RUN terraform init
-COPY ./* .
-RUN terraform init
+COPY ./*.sh .
 RUN chmod 700 Deploy.sh
 RUN chmod 700 Destroy.sh
 CMD "Deploy.sh"
