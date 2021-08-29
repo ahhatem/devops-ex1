@@ -18,4 +18,4 @@ WORKDIR '/Config'
 COPY ./*.sh .
 RUN chmod 700 Deploy.sh
 RUN chmod 700 Destroy.sh
-CMD "Deploy.sh"
+CMD "./Deploy.sh"
