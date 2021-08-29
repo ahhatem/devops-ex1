@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# exit when any command fails (return non-zero value)
-set -e
+basedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+echo BaseDir is $basedir
 
-cd Terraform
-./Deploy.sh
-sleep 20
-cd ../Ansible
-./Deploy.sh
+docker build -t terrafromansible ./src
+docker run -v "$basedir/src":/src -it terrafromansible /src/Deploy.sh
