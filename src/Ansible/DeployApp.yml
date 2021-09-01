@@ -11,39 +11,15 @@
     template:
         src: DB_url.j2
         dest: /tmp/Dell_DemoApp_DB
-  - name: Install docker
-    yum:
-        name: 
-            - docker
-            - git
-        state: present
-    become: yes
-  - name: Start service docker
-    ansible.builtin.service:
-      name: docker
-      state: started
-      enabled: yes
-    become: yes
-  - name: Delete content & directory
-    file:
-      state: absent
-      path: /app
-  - name: create source folder
-    file:
-        dest: /app
-        state: directory
-        mode: '0777'
-    become: yes
-  - name: Example clone of a single branch
-    git:
-      repo: https://github.com/busbud/devops-challenge-apps.git
-      dest: /app
-      version: master
-  - name: Install docker-compose
-    get_url: 
-      url : https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-Linux-x86_64
-      dest: /usr/bin/docker-compose
-      mode: 'u+x,g+x'
+  - name: install docker and docker-compose
+    include_role:
+        name: docker_compose
+  - name: gitclone the app
+    include_role:
+        name: gitclone
+    vars:
+        dest: '/app'
+        repo: 'https://github.com/busbud/devops-challenge-apps.git'
   - name: Change node version for bug with pgsql
     lineinfile: 
       path: /app/api/docker-compose.yml
@@ -85,40 +61,15 @@
     file:
         dest: /tmp/Dell_DemoApp_API_{{API}}
         state: touch
-  - name: Install docker
-    yum:
-        name: 
-            - docker
-            - git
-        state: present
-    become: yes
-  - name: Start service docker
-    ansible.builtin.service:
-      name: docker
-      state: started
-      enabled: yes
-    become: yes
-  - name: Delete content & directory
-    file:
-      state: absent
-      path: /app
-  - name: create source folder
-    file:
-        dest: /app
-        state: directory
-        mode: '0777'
-    become: yes
-  - name: Example clone of a single branch
-    git:
-      repo: https://github.com/busbud/devops-challenge-apps.git
-      dest: /app
-      version: master
-  - name: Install docker-compose
-    become: yes
-    get_url: 
-      url : https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-Linux-x86_64
-      dest: /usr/bin/docker-compose
-      mode: 'u+x,g+x'
+  - name: install docker and docker-compose
+    include_role:
+        name: docker_compose
+  - name: gitclone the app
+    include_role:
+        name: gitclone
+    vars:
+        dest: '/app'
+        repo: 'https://github.com/busbud/devops-challenge-apps.git'
   - name: run docker compose install
     shell: 
       cmd: /usr/bin/docker-compose run web npm install

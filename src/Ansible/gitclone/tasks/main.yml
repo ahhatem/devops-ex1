@@ -1,0 +1,15 @@
+- name: Delete content & directory
+  file:
+    state: absent
+    path: '{{dest}}' 
+- name: create source folder
+  file:
+      dest: '{{dest}}'
+      state: directory
+      mode: '0777'
+  become: yes
+- name: Example clone of a single branch
+  git:
+    repo: '{{repo}}'
+    dest: '{{dest}}'
+    version: master
