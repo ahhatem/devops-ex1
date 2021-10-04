@@ -1,2 +1,2 @@
-*Credentials*
+awsCredentials.auto.tfvars
 .terraform/*
