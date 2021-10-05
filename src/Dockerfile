@@ -7,4 +7,7 @@ RUN yum -y install ansible
 RUN yum -y install openssh openssh-clients
 RUN echo 'export PATH=$PATH:/usr/bin/' >> ~/.bashrc
 WORKDIR /src
-RUN cp * /src
+RUN cp Ansible /src
+RUN cp Terraform /src
+RUN cp Deploy.sh /src
+RUN cp Destroy.sh /src
