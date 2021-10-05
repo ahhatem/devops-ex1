@@ -7,7 +7,7 @@ RUN yum -y install ansible
 RUN yum -y install openssh openssh-clients
 RUN echo 'export PATH=$PATH:/usr/bin/' >> ~/.bashrc
 WORKDIR /src
-COPY ./* /src
-RUN chmod 700 /src/Desploy.sh
-RUN chmod 700 /src/Ansible/Desploy.sh
-RUN chmod 700 /src/Terraform/Desploy.sh
+COPY . .
+RUN chmod 700 /src/Deploy.sh
+RUN chmod 700 /src/Ansible/Deploy.sh
+RUN chmod 700 /src/Terraform/Deploy.sh
