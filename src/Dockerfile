@@ -6,3 +6,5 @@ RUN yum -y install epel-release
 RUN yum -y install ansible
 RUN yum -y install openssh openssh-clients
 RUN echo 'export PATH=$PATH:/usr/bin/' >> ~/.bashrc
+WORKDIR /src
+RUN cp ./* /src
